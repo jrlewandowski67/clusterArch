@@ -1,32 +1,58 @@
+
 name: Build clusterArch macOS Apple Silicon
+
 on:
   workflow_dispatch:
   push:
-    branches: [main, master]
-    paths: ['macos/**', '.github/workflows/macos.yml', '*.py']
+    branches:
+      - main
+      - master
+    paths:
+      - 'macos/**'
+      - '.github/workflows/macos.yml'
+      - '*.py'
 
 permissions:
   contents: read
 
 jobs:
   build:
+    name: Build Apple Silicon app
     runs-on: macos-15
-    
+    timeout-minutes: 60
+
     steps:
-      - name: Checkout repository
-      - uses: actions/checkout@v6
-      with:
-          persist-credentials: false
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
           fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          architecture: arm64
+
       - name: Prepare native dependencies
+        shell: bash
         run: |
+          set -euo pipefail
           brew install blast hmmer
           python3 --version
+          command -v blastp
+          command -v hmmsearch
+
       - name: Build standalone application
-        run: bash macos/build.sh
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash macos/build.sh
+
       - name: Upload macOS application
         uses: actions/upload-artifact@v4
         with:
           name: clusterArch-macos-arm64
           path: dist/clusterArch-macos-arm64.zip
           if-no-files-found: error
+          retention-days: 14
