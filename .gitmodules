@@ -1,0 +1,3 @@
+[submodule "clusterTools"]
+	path = clusterTools
+	url = https://github.com/emzodls/clusterTools.git
