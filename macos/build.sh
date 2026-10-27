@@ -28,5 +28,6 @@ done
 # Collect dynamic library dependencies from Homebrew; reject any unresolved external links.
 python3 macos/bundle_dylibs.py "$RESOURCE/bin" "$APP"
 python3 macos/check_bundle.py "$APP"
+bash macos/sign_bundle.sh "$APP"
 mkdir -p dist
 /usr/bin/ditto -c -k --sequesterRsrc --keepParent "$APP" dist/clusterArch-macos-arm64.zip
