@@ -1,0 +1,23 @@
+name: Build clusterArch macOS Apple Silicon
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+    paths: ['macos/**', '.github/workflows/macos.yml', '*.py']
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare native dependencies
+        run: |
+          brew install blast hmmer
+          python3 --version
+      - name: Build standalone application
+        run: bash macos/build.sh
+      - name: Upload macOS application
+        uses: actions/upload-artifact@v4
+        with:
+          name: clusterArch-macos-arm64
+          path: dist/clusterArch-macos-arm64.zip
+          if-no-files-found: error
