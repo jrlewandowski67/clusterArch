@@ -23,7 +23,7 @@
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
-from Bio.Alphabet import generic_protein,generic_dna
+
 from clusterTools import clusterAnalysis
 from random import random
 import subprocess,os,platform
@@ -258,7 +258,7 @@ def runHmmsearch(hmmSearchExec,hmmDBase,outputDir,searchName,dbPath,eValue='1E-0
 def generateInputFasta(forBLAST,outputDir,searchName):
     with open(os.path.join('%s' % outputDir,'{}_gene_queries.fa'.format(searchName)),'w') as outfile:
         for gene in forBLAST.keys():
-            prot_entry = SeqRecord(Seq(forBLAST[gene],generic_protein), id=gene,
+            prot_entry = SeqRecord(Seq(forBLAST[gene]), id=gene,
                                description='%s' % (gene))
             SeqIO.write(prot_entry,outfile,'fasta')
 
@@ -898,7 +898,7 @@ def ncbiGenomeFastaParser(fastaHandle):
     for line in fastaHandle:
         if '>' in line:
             if id and sequence:
-                dnaSeq = Seq(sequence,generic_dna)
+                dnaSeq = Seq(sequence)
                 proteinSeq = dnaSeq.translate()
                 fastaDict[id] = dnaSeq.translate()
             sequence = ''
@@ -907,7 +907,7 @@ def ncbiGenomeFastaParser(fastaHandle):
             cdsInfoParse = rawCDSid.split('_')
             species_id = rawCDSid.split('_cds_')[0]
             cds_ctr = int(cdsInfoParse[-1])
-            descriptors = re.findall('\[{1}\w+\={1}[^=]*\]', line)
+            descriptors = re.findall(r'\[{1}\w+\={1}[^=]*\]', line)
             descriptors_dict = dict()
             for match in descriptors:
                 try:
@@ -916,7 +916,7 @@ def ncbiGenomeFastaParser(fastaHandle):
                 except ValueError:
                     print(match[1:-1])
                     pass
-            location = re.findall('\d+', descriptors_dict['location'])
+            location = re.findall(r'\d+', descriptors_dict['location'])
             gene_start = int(location[0])
             gene_end = int(location[-1])
             if 'complement' in descriptors_dict['location']:
