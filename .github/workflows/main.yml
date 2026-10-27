@@ -26,6 +26,7 @@ jobs:
         with:
           fetch-depth: 1
           persist-credentials: false
+          submodules: false
 
       - name: Set up Python
         uses: actions/setup-python@v6
