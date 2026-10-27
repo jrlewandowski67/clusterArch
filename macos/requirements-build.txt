@@ -1,0 +1,6 @@
+PyQt5>=5.15,<5.16
+pyinstaller>=6,<7
+biopython>=1.80,<1.86
+wget
+requests
+numpy
