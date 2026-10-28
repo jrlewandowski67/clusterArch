@@ -1,3 +1,4 @@
+
 name: Build clusterArch macOS Apple Silicon
 
 on:
@@ -6,10 +7,6 @@ on:
     branches:
       - main
       - master
-    paths:
-      - 'macos/**'
-      - '.github/workflows/macos.yml'
-      - '*.py'
 
 permissions:
   contents: read
@@ -26,7 +23,7 @@ jobs:
         with:
           fetch-depth: 1
           persist-credentials: false
-          submodules: false
+          submodules: recursive
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -42,6 +39,43 @@ jobs:
           python3 --version
           command -v blastp
           command -v hmmsearch
+
+      - name: Install additional Python dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install sortedcontainers bx-python
+
+      - name: Patch legacy clusterTools compatibility
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path("clusterTools/clusterAnalysis.py")
+          if not p.is_file():
+              raise SystemExit("Missing clusterTools/clusterAnalysis.py")
+
+          source = p.read_text()
+          old = "from sortedcontainers import SortedDict, SortedListWithKey"
+          new = "from sortedcontainers import SortedDict, SortedKeyList as SortedListWithKey"
+
+          if old in source:
+              p.write_text(source.replace(old, new))
+              print("Patched sortedcontainers compatibility")
+          elif new in source:
+              print("Already patched")
+          else:
+              print("No legacy sortedcontainers import found")
+          PY
+
+      - name: Verify clusterTools imports
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -c "from clusterTools import clusterAnalysis; print('clusterAnalysis import OK')"
 
       - name: Build standalone application
         shell: bash
