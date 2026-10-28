@@ -10,11 +10,29 @@ source .venv/bin/activate
 python -m pip install --upgrade pip setuptools wheel
 python -m pip install -r macos/requirements-build.txt
 rm -rf build/clusterArch dist/clusterArch.app
+
 python -m PyInstaller --noconfirm --clean --windowed --name clusterArch \
-  --paths . --collect-all Bio --collect-all PyQt5 \
-  --hidden-import main --hidden-import gui --hidden-import clusterToolsParser \
-  --add-data 'htmlvis:htmlvis' --add-data 'testHMM.fasta:.' \
-  --add-data 'macDeps:macDeps' --add-data 'clusterTools:clusterTools' macos/launcher.py
+  --paths . \
+  --collect-all Bio \
+  --collect-all PyQt5 \
+  --collect-all sortedcontainers \
+  --collect-all bx \
+  --collect-submodules clusterTools \
+  --hidden-import main \
+  --hidden-import gui \
+  --hidden-import clusterToolsParser \
+  --hidden-import clusterTools.clusterAnalysis \
+  --hidden-import clusterTools.clusterDistance \
+  --hidden-import clusterTools.clusterDomStrs \
+  --hidden-import clusterTools.clusterGenbank \
+  --hidden-import clusterTools.clusterGraphics \
+  --hidden-import clusterTools.genbank_process \
+  --add-data 'htmlvis:htmlvis' \
+  --add-data 'testHMM.fasta:.' \
+  --add-data 'macDeps:macDeps' \
+  --add-data 'clusterTools:clusterTools' \
+  macos/launcher.py
+
 APP="dist/clusterArch.app"
 RESOURCE="$APP/Contents/Frameworks"
 # PyInstaller one-dir app stores collected data beneath Contents/Frameworks/_internal
