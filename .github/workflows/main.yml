@@ -43,9 +43,9 @@ jobs:
       - name: Install additional Python dependencies
         shell: bash
         run: |
-          set -euo pipefail
-          python -m pip install --upgrade pip
-          python -m pip install sortedcontainers bx-python
+         set -euo pipefail
+         python -m pip install --upgrade pip
+         python -m pip install biopython sortedcontainers bx-python
 
       - name: Patch legacy clusterTools compatibility
         shell: bash
