@@ -9,6 +9,26 @@ python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip setuptools wheel
 python -m pip install -r macos/requirements-build.txt
+
+# Install legacy scientific dependencies in the same
+# virtual environment used by PyInstaller.
+python -m pip install biopython sortedcontainers bx-python
+
+# Verify dependencies before building.
+python - <<'PY'
+import sys
+import Bio
+import sortedcontainers
+import bx
+from clusterTools import clusterAnalysis
+
+print("Python:", sys.executable)
+print("Biopython:", Bio.__version__)
+print("sortedcontainers:", sortedcontainers.__file__)
+print("bx-python:", bx.__file__)
+print("clusterAnalysis:", clusterAnalysis.__file__)
+print("All required imports succeeded.")
+PY
 rm -rf build/clusterArch dist/clusterArch.app
 
 python -m PyInstaller --noconfirm --clean --windowed --name clusterArch \
